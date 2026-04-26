@@ -21,15 +21,25 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +54,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mendoza.ruiz.myapplicationmovies.MainActivity
+import mendoza.ruiz.myapplicationmovies.navigation.AppNavigation
+import mendoza.ruiz.myapplicationmovies.navigation.NavItem
+
 // ── Paleta de colores
 private val Background   = Color(0xFF0D0D12)
 private val CardBg       = Color(0xFF1A1A24)
@@ -54,7 +68,40 @@ private val TextSecondary= Color(0xFFB0B0C0)
 private val StarYellow   = Color(0xFFFFC107)
 private val PremiereTag  = Color(0xFFE040FB)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(modifier: Modifier = Modifier) {
+
+    val navItemList = listOf(
+        NavItem("Home", Icons.Default.Home),
+        NavItem("Profile", Icons.Default.Person),
+        NavItem("Settings", Icons.Default.Settings),
+
+    )
+
+    //var selectedIndex by remember { mutableIntStateOf(0) }
+    var selectedIndex by remember { mutableIntStateOf(0) }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            NavigationBar {
+                navItemList.forEachIndexed { index, navItem ->
+                    NavigationBarItem(
+                        selected = selectedIndex == index,
+                        onClick = { selectedIndex = index },
+                        icon = {
+                            Icon(imageVector = navItem.icon, contentDescription = navItem.label)
+                        },
+                        label = {
+                            Text(text = navItem.label)
+                        }
+                    )
+                }
+            }
+        }
+    ) { innerPadding ->
+        HomeScreen(modifier = Modifier.padding(innerPadding))
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
