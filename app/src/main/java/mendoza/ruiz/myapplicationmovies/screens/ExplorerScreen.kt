@@ -1,5 +1,6 @@
 package mendoza.ruiz.myapplicationmovies.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
@@ -39,7 +40,7 @@ private val TextSecondary = Color(0xFFB0B0C0)
 private val SearchBg      = Color(0xFF1A1A26)
 private val StarYellow    = Color(0xFFFFC107)
 
-// ── Modelos de datos ───────────────────────────────────────────────────────────
+// ── Modelos de datos
 data class Pelicula(
     val id: Int,
     val title: String,
@@ -62,6 +63,8 @@ private val genres = listOf("ALL", "ACTION", "DRAMA", "SCI-FI", "HORROR", "MYSTE
 private const val PAGE_SIZE = 10
 
 // ── Pantalla principal
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ExploreScreen(peliculas: List<Pelicula> = emptyList()) {
     var searchQuery by remember {mutableStateOf("")}

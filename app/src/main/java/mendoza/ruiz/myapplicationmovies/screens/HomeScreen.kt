@@ -1,5 +1,6 @@
 package mendoza.ruiz.myapplicationmovies.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -21,25 +22,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,56 +43,23 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mendoza.ruiz.myapplicationmovies.MainActivity
-import mendoza.ruiz.myapplicationmovies.navigation.AppNavigation
-import mendoza.ruiz.myapplicationmovies.navigation.NavItem
 
 // ── Paleta de colores
 private val Background   = Color(0xFF0D0D12)
-private val CardBg       = Color(0xFF1A1A24)
+//private val CardBg       = Color(0xFF1A1A24)
 private val AccentCyan   = Color(0xFF00E5FF)
 private val AccentPink   = Color(0xFFE040FB)
 private val TextPrimary  = Color(0xFFFFFFFF)
 private val TextSecondary= Color(0xFFB0B0C0)
 private val StarYellow   = Color(0xFFFFC107)
 private val PremiereTag  = Color(0xFFE040FB)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
-
-    val navItemList = listOf(
-        NavItem("Home", Icons.Default.Home),
-        NavItem("Profile", Icons.Default.Person),
-        NavItem("Settings", Icons.Default.Settings),
-
-    )
-
-    //var selectedIndex by remember { mutableIntStateOf(0) }
-    var selectedIndex by remember { mutableIntStateOf(0) }
-
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            NavigationBar {
-                navItemList.forEachIndexed { index, navItem ->
-                    NavigationBarItem(
-                        selected = selectedIndex == index,
-                        onClick = { selectedIndex = index },
-                        icon = {
-                            Icon(imageVector = navItem.icon, contentDescription = navItem.label)
-                        },
-                        label = {
-                            Text(text = navItem.label)
-                        }
-                    )
-                }
-            }
-        }
-    ) { innerPadding ->
-        HomeScreen(modifier = Modifier.padding(innerPadding))
-    }
 
     Column(
         modifier = Modifier
@@ -121,7 +80,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     }
 }
 @Composable
-fun HeroSection() {
+fun HeroSection(modifier: Modifier = Modifier) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -285,7 +244,7 @@ fun HeroSection() {
     }
 }
 @Composable
-fun NowPlayingSection() {
+fun NowPlayingSection(modifier: Modifier = Modifier) {
     Column {
         // Encabezado
         Row(
@@ -390,7 +349,7 @@ private val genres = listOf(
 )
 
 @Composable
-fun PopularGenresSection() {
+fun PopularGenresSection(modifier: Modifier = Modifier) {
     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
         Text(
             text = "Generos populares",
@@ -454,7 +413,7 @@ private val trendingItems = listOf(
     Pair("#03", "QUANTUM STATE"),
 )
 @Composable
-fun TrendingNowSection() {
+fun TrendingNowSection(modifier: Modifier = Modifier) {
     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
         // Encabezado
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -531,7 +490,7 @@ private val continueItems = listOf(
     ),
 )
 @Composable
-fun ContinueWatchingSection() {
+fun ContinueWatchingSection(modifier: Modifier = Modifier) {
     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
         Text(
             text = "Continuar viendo",
@@ -635,29 +594,4 @@ fun ContinueCard(item: ContinueItem, modifier: Modifier = Modifier) {
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview(){
-    HomeScreen()
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HeroSectionPreview(){
-    HeroSection()
-}
-
-@Preview(showBackground = true)
-@Composable
-fun NowPlayingSectionPreview(){
-    NowPlayingSection()
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TrendingNowSectionPreview(){
-    TrendingNowSection()
-
 }
