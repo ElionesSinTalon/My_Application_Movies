@@ -30,9 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 
-// ── Colores
+// ── Colors
 private val Background    = Color(0xFF0D0D12)
-private val SurfaceCard   = Color(0xFF16161F)
+//private val SurfaceCard   = Color(0xFF16161F)
 private val AccentCyan    = Color(0xFF00E5FF)
 private val AccentPink    = Color(0xFFE040FB)
 private val TextPrimary   = Color(0xFFFFFFFF)

@@ -16,7 +16,7 @@ import mendoza.ruiz.myapplicationmovies.ui.theme.BottomBar
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-
+import mendoza.ruiz.myapplicationmovies.screens.ProfileScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +38,7 @@ class MainActivity : ComponentActivity() {
                     when(selectedIndex){
                         0 -> HomeScreen()
                         1 -> ExploreScreen()
+                        3 -> ProfileScreen()
                     }
                 }
             }

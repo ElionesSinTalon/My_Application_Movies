@@ -7,3 +7,6 @@ object Home
 
 @Serializable
 object Explorer
+
+@Serializable
+object Profile

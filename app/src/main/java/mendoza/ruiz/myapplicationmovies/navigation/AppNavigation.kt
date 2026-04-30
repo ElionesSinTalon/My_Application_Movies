@@ -4,6 +4,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import mendoza.ruiz.myapplicationmovies.screens.ExploreScreen
 import mendoza.ruiz.myapplicationmovies.screens.HomeScreen
+import mendoza.ruiz.myapplicationmovies.screens.ProfileScreen
 
 @Composable
 fun AppNavigation() {
@@ -14,6 +15,9 @@ fun AppNavigation() {
         }
         composable("explorer"){
             ExploreScreen()
+        }
+        composable("profile") {
+            ProfileScreen()
         }
     }
 }
