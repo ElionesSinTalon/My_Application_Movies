@@ -50,7 +50,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// ── Colores
+// ── Colors
 private val Background    = Color(0xFF0D0D12)
 private val SurfaceCard   = Color(0xFF16161F)
 private val AccentCyan    = Color(0xFF00E5FF)
@@ -114,6 +114,11 @@ fun ProfileScreen() {
 
         // Mi Lista
         MiListaSection()
+
+        Spacer(modifier = Modifier.height(36.dp))
+
+        // My Collections
+        MyCollectionsSection()
 
         Spacer(modifier = Modifier.height(40.dp))
     }
@@ -330,7 +335,7 @@ private val miListaItems = listOf(
 
 private val listaTabs = listOf("All", "Movies", "Series", "Recent")
 
-// ── Mi Lista Section
+// ── Mi Lista Section ───────────────────────────────────────────────────────────
 @Composable
 fun MiListaSection() {
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -534,5 +539,193 @@ fun ListaCard(item: ListaItem, modifier: Modifier = Modifier) {
             color = TextSecondary,
             fontSize = 11.sp
         )
+    }
+}
+
+// ── Datos My Collections
+data class Collection(
+    val name: String,
+    val type: String,          // "PUBLIC COLLECTION" / "PRIVATE COLLECTION"
+    val count: Int,
+    val isPrivate: Boolean,
+    val thumbColors: List<List<Color>>   // colores para los thumbnails apilados
+)
+
+private val collections = listOf(
+    Collection(
+        name = "Film Noir Essentials",
+        type = "PUBLIC COLLECTION",
+        count = 14,
+        isPrivate = false,
+        thumbColors = listOf(
+            listOf(Color(0xFF0A0A1A), Color(0xFF14142A)),
+            listOf(Color(0xFF1A0A0A), Color(0xFF2A1414)),
+        )
+    ),
+    Collection(
+        name = "Modern Thrillers",
+        type = "PRIVATE COLLECTION",
+        count = 5,
+        isPrivate = true,
+        thumbColors = listOf(
+            listOf(Color(0xFF0A1018), Color(0xFF141828)),
+        )
+    ),
+)
+
+// ── My Collections Section
+@Composable
+fun MyCollectionsSection() {
+    Column(modifier = Modifier.fillMaxWidth()) {
+
+        // Título
+        Text(
+            text = "My Collections",
+            color = TextPrimary,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Cards de colecciones
+        collections.forEach { collection ->
+            CollectionCard(collection = collection)
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Botón New Collection
+        NewCollectionButton()
+    }
+}
+
+// ── Collection Card
+@Composable
+fun CollectionCard(collection: Collection) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(SurfaceCard)
+            .border(1.dp, DividerColor, RoundedCornerShape(16.dp))
+            .clickable { }
+            .padding(16.dp)
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Thumbnails apilados
+                StackedThumbnails(
+                    colors = collection.thumbColors,
+                    count = collection.count
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            Text(
+                text = collection.name,
+                color = TextPrimary,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = collection.type,
+                color = TextSecondary,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 0.8.sp
+            )
+        }
+    }
+}
+
+// ── Thumbnails apilados
+@Composable
+fun StackedThumbnails(colors: List<List<Color>>, count: Int) {
+    Box(modifier = Modifier.height(48.dp)) {
+        colors.forEachIndexed { index, colorPair ->
+            Box(
+                modifier = Modifier
+                    .offset(x = (index * 30).dp)
+                    .size(width = 48.dp, height = 48.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Brush.verticalGradient(colorPair))
+                    .border(1.dp, DividerColor, RoundedCornerShape(8.dp))
+            )
+        }
+        // Badge con contador "+N"
+        Box(
+            modifier = Modifier
+                .offset(x = (colors.size * 30).dp)
+                .size(width = 48.dp, height = 48.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color(0xFF252535))
+                .border(1.dp, DividerColor, RoundedCornerShape(8.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "+$count",
+                color = AccentPink,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
+    }
+}
+
+// ── Botón New Collection
+@Composable
+fun NewCollectionButton() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color(0xFF12121C))
+            .border(
+                width = 1.dp,
+                color = DividerColor,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .clickable { }
+            .padding(vertical = 20.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            // Ícono "+"  circular con borde
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .border(
+                        width = 1.5.dp,
+                        brush = Brush.verticalGradient(listOf(AccentCyan, AccentPink)),
+                        shape = CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "+",
+                    color = TextPrimary,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Light
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Nueva Coleccion",
+                color = TextSecondary,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.5.sp
+            )
+        }
     }
 }

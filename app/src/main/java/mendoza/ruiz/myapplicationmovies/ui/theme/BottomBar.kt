@@ -110,9 +110,7 @@ fun BottomBar(
                     isSelected = selectedIndex == realIndex,
                     onClick = { onItemSelected(realIndex) },
                     modifier = Modifier.weight(1f),
-                    // PROFILE tiene borde punteado cuando está activo
-                    isDashed = item.label == "PROFILE" && selectedIndex == realIndex
-                )
+                    )
             }
         }
     }
@@ -203,11 +201,11 @@ fun CenterButton(
         }
     }
 }
-
+/*
 @Composable
 fun ScreensNavigation(modifier: Modifier = Modifier, selectedIndex : Int){
     when(selectedIndex){
         0 -> HomeScreen()
         1 -> ExploreScreen()
     }
-}
+}*/

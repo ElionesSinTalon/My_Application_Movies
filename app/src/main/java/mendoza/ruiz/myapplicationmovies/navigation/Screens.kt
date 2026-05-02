@@ -10,3 +10,6 @@ object Explorer
 
 @Serializable
 object Profile
+
+@Serializable
+object Premiere
