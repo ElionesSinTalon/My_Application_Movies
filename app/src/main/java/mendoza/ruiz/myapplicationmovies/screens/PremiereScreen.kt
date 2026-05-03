@@ -4,30 +4,53 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
-//import androidx.compose.material.icons.filled.ChevronRight
-//import androidx.compose.material.icons.filled.ConfirmationNumber
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 
-// ── Colores ────────────────────────────────────────────────────────────────────
+// ── Colors
 private val Background    = Color(0xFF0D0D12)
 private val SurfaceCard   = Color(0xFF16161F)
 private val AccentCyan    = Color(0xFF00E5FF)
@@ -37,6 +60,55 @@ private val TextSecondary = Color(0xFFB0B0C0)
 private val DividerColor  = Color(0xFF2A2A3A)
 
 // ── Modelos
+data class FeaturedMovie(
+    val title: String,
+    val titleAccent: String,        // parte del titulo en color accent
+    val duration: String,
+    val genre: String,
+    val format: String,
+    val badge: String,
+    val bgColors: List<Color>
+)
+
+private val featuredMovies = listOf(
+    FeaturedMovie(
+        title = "CYBERPUNK ",
+        titleAccent = "2077",
+        duration = "154 min",
+        genre = "Acción / Sci-Fi",
+        format = "IMAX 4D",
+        badge = "ESTRENO MUNDIAL",
+        bgColors = listOf(Color(0xFF051014), Color(0xFF0A1A20), Color(0xFF0D0D12))
+    ),
+    FeaturedMovie(
+        title = "NEON ",
+        titleAccent = "NIGHTS",
+        duration = "118 min",
+        genre = "Thriller / Noir",
+        format = "DOLBY",
+        badge = "PRE-ESTRENO",
+        bgColors = listOf(Color(0xFF1A0030), Color(0xFF0D001A), Color(0xFF0D0D12))
+    ),
+    FeaturedMovie(
+        title = "THE ",
+        titleAccent = "VOID",
+        duration = "132 min",
+        genre = "Horror / Misterio",
+        format = "4DX",
+        badge = "PRÓXIMAMENTE",
+        bgColors = listOf(Color(0xFF080810), Color(0xFF10101A), Color(0xFF0D0D12))
+    ),
+    FeaturedMovie(
+        title = "CHROME ",
+        titleAccent = "SOUL",
+        duration = "145 min",
+        genre = "Acción / Drama",
+        format = "IMAX",
+        badge = "ESTRENO MUNDIAL",
+        bgColors = listOf(Color(0xFF1A0800), Color(0xFF100500), Color(0xFF0D0D12))
+    ),
+)
+
 data class ProximaMovie(
     val title: String,
     val director: String,
@@ -124,7 +196,8 @@ fun PremiereScreen() {
             .background(Background)
             .verticalScroll(rememberScrollState())
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
+        FeaturedMoviePager()
+        Spacer(modifier = Modifier.height(32.dp))
         ProximamenteSection()
         Spacer(modifier = Modifier.height(36.dp))
         EntradasAnticipadasSection()
@@ -132,6 +205,182 @@ fun PremiereScreen() {
     }
 }
 
+// ── Featured Movie Auto-Pager
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+fun FeaturedMoviePager() {
+    val pagerState = rememberPagerState(pageCount = { maxOf(featuredMovies.size, 1) })
+
+    // Auto-scroll cada 4 segundos
+    LaunchedEffect(pagerState) {
+        while (true) {
+            delay(5000)
+            val next = (pagerState.currentPage + 1) % featuredMovies.size
+            pagerState.animateScrollToPage(next)
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(320.dp)
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { page ->
+            FeaturedMovieSlide(movie = featuredMovies[page])
+        }
+
+        // Indicadores de puntos
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            repeat(featuredMovies.size) { index ->
+                val isActive = pagerState.currentPage == index
+                Box(
+                    modifier = Modifier
+                        .size(if (isActive) 20.dp else 6.dp, 6.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(
+                            if (isActive)
+                                Brush.horizontalGradient(listOf(AccentCyan, AccentPink))
+                            else
+                                Brush.horizontalGradient(listOf(Color(0xFF444455), Color(0xFF444455)))
+                        )
+                )
+            }
+        }
+    }
+}
+
+// ── Slide individual del pager
+@Composable
+fun FeaturedMovieSlide(movie: FeaturedMovie) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Brush.verticalGradient(movie.bgColors))
+    ) {
+        // Degradado inferior
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .align(Alignment.BottomCenter)
+                .background(
+                    Brush.verticalGradient(listOf(Color.Transparent, Background))
+                )
+        )
+
+        // Contenido
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 20.dp, end = 20.dp, bottom = 36.dp)
+        ) {
+            // Badge estreno
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = AccentCyan,
+                    modifier = Modifier.size(12.dp)
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(
+                    text = movie.badge,
+                    color = AccentCyan,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Título con acento de color
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(SpanStyle(color = TextPrimary, fontWeight = FontWeight.ExtraBold)) {
+                        append(movie.title)
+                    }
+                    withStyle(SpanStyle(
+                        brush = Brush.horizontalGradient(listOf(AccentCyan, AccentPink)),
+                        fontWeight = FontWeight.ExtraBold
+                    )) {
+                        append(movie.titleAccent)
+                    }
+                },
+                fontSize = 36.sp,
+                lineHeight = 40.sp
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Metadata: duración · género · formato
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "⏱ ${movie.duration}", color = TextSecondary, fontSize = 12.sp)
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(text = "🎬 ${movie.genre}", color = TextSecondary, fontSize = 12.sp)
+                Spacer(modifier = Modifier.width(10.dp))
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .border(1.dp, TextSecondary.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = movie.format,
+                        color = TextSecondary,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Botón VER TRÁILER
+            Button(
+                onClick = { },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                shape = RoundedCornerShape(10.dp),
+                contentPadding = PaddingValues(0.dp),
+                modifier = Modifier
+                    .height(46.dp)
+                    .widthIn(min = 160.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(
+                        Brush.horizontalGradient(listOf(AccentCyan, AccentPink))
+                    )
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = null,
+                        tint = Background,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "VER TRÁILER",
+                        color = Background,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = 0.5.sp
+                    )
+                }
+            }
+        }
+    }
+}
 // ── Próximamente
 @Composable
 fun ProximamenteSection() {
@@ -164,7 +413,7 @@ fun ProximamenteSection() {
                 )
                 Spacer(modifier = Modifier.width(2.dp))
                 Icon(
-                    imageVector = Icons.Default.Star,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
                     tint = AccentCyan,
                     modifier = Modifier.size(16.dp)
@@ -419,7 +668,7 @@ fun EntradaCard(entrada: EntradaAnticipada, modifier: Modifier = Modifier) {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Default.CheckCircle,
+                    imageVector = Icons.Default.Done,
                     contentDescription = null,
                     tint = entrada.badgeColor,
                     modifier = Modifier.size(14.dp)

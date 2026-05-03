@@ -36,8 +36,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import mendoza.ruiz.myapplicationmovies.screens.ExploreScreen
-import mendoza.ruiz.myapplicationmovies.screens.HomeScreen
 
 // ── Colores
 private val NavBackground = Color(0xFF12121C)
@@ -56,7 +54,7 @@ data class NavItem(
 private val navItems = listOf(
     NavItem("HOME",    Icons.Default.Home),
     NavItem("MOVIES",  Icons.Default.PlayArrow),
-    NavItem("LIBRARY", Icons.Default.Search),
+    NavItem("PREMIERE", Icons.Default.Search),
     NavItem("PROFILE", Icons.Default.AccountCircle),
 )
 
@@ -201,11 +199,3 @@ fun CenterButton(
         }
     }
 }
-/*
-@Composable
-fun ScreensNavigation(modifier: Modifier = Modifier, selectedIndex : Int){
-    when(selectedIndex){
-        0 -> HomeScreen()
-        1 -> ExploreScreen()
-    }
-}*/

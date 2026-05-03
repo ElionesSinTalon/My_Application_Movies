@@ -10,7 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import mendoza.ruiz.myapplicationmovies.screens.ExploreScreen
+import mendoza.ruiz.myapplicationmovies.screens.ExplorerScreen
 import mendoza.ruiz.myapplicationmovies.screens.HomeScreen
 import mendoza.ruiz.myapplicationmovies.screens.PremiereScreen
 import mendoza.ruiz.myapplicationmovies.screens.ProfileScreen
@@ -60,7 +60,7 @@ fun AppNavigation() {
             modifier = Modifier.padding(innerPadding)
         ){
             composable("home") {HomeScreen()}
-            composable ("explorer" ) {ExploreScreen()}
+            composable ("explorer" ) { ExplorerScreen()}
             composable("profile") { ProfileScreen() }
             composable("premiere") { PremiereScreen() }
         }

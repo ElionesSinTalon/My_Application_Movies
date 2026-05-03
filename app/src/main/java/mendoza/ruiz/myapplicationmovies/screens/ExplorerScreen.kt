@@ -66,7 +66,7 @@ private const val PAGE_SIZE = 10
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ExploreScreen(peliculas: List<Pelicula> = emptyList()) {
+fun ExplorerScreen(peliculas: List<Pelicula> = emptyList()) {
     var searchQuery by remember {mutableStateOf("")}
     var selectedGenre by remember {mutableStateOf("ALL")}
     var visibleCount by remember {mutableIntStateOf(PAGE_SIZE)}
@@ -306,7 +306,7 @@ fun MovieExploreCard(pelicula: Pelicula, modifier: Modifier = Modifier) {
     }
 }
 
-// ── Reveal More Button ─────────────────────────────────────────────────────────
+// ── Reveal More Button
 @Composable
 fun RevealMoreButton(
     onClick: () -> Unit,
