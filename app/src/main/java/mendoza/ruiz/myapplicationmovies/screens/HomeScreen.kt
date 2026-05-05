@@ -32,6 +32,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,10 +47,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import mendoza.ruiz.myapplicationmovies.repository.PeliculaRepository
+import mendoza.ruiz.myapplicationmovies.ui.theme.MyApplicationMoviesTheme
+import mendoza.ruiz.myapplicationmovies.viewmodel.HomeViewModel
+import mendoza.ruiz.myapplicationmovies.viewmodel.ViewModelFactory
 
-// ── Paleta de colores
+// ── Paleta de colors
 private val Background   = Color(0xFF0D0D12)
-//private val CardBg       = Color(0xFF1A1A24)
 private val AccentCyan   = Color(0xFF00E5FF)
 private val AccentPink   = Color(0xFFE040FB)
 private val TextPrimary  = Color(0xFFFFFFFF)
@@ -60,6 +66,20 @@ private val PremiereTag  = Color(0xFFE040FB)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
+
+    /*
+    val factory = ViewModelFactory(PeliculaRepository(/*PeliculaApiService*/))
+    val viewModel: HomeViewModel = viewModel(factory = factory)
+    val uiState by viewModel.uiState.collectAsState()
+
+
+    // Tu UI usando uiState
+    MyApplicationMoviesTheme(
+        featured   = uiState.featuredPeliculas,
+        nowPlaying = uiState.nowPlaying,
+        trending   = uiState.trending,
+        isLoading  = uiState.isLoading
+    )*/
 
     Column(
         modifier = Modifier

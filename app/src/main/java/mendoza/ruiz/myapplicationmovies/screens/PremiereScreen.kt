@@ -59,7 +59,7 @@ private val TextPrimary   = Color(0xFFFFFFFF)
 private val TextSecondary = Color(0xFFB0B0C0)
 private val DividerColor  = Color(0xFF2A2A3A)
 
-// ── Modelos
+// ── Models
 data class FeaturedMovie(
     val title: String,
     val titleAccent: String,        // parte del titulo en color accent

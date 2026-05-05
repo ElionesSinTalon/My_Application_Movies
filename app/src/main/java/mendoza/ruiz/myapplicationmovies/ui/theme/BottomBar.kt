@@ -37,12 +37,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// ── Colores
+// ── Colors
 private val NavBackground = Color(0xFF12121C)
 private val NavBorder     = Color(0xFF2A2A3A)
 private val AccentCyan    = Color(0xFF00E5FF)
-private val AccentPink    = Color(0xFFE040FB)
-private val TextActive    = Color(0xFFFFFFFF)
+//private val AccentPink    = Color(0xFFE040FB)
+//private val TextActive    = Color(0xFFFFFFFF)
 private val TextInactive  = Color(0xFF6B6B80)
 
 // ── Modelo de ítem
@@ -68,10 +68,10 @@ fun BottomBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(180.dp)
             .background(NavBackground)
             .border(
-                width = 1.dp,
+                width = 2.dp,
                 color = NavBorder,
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
             )
