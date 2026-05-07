@@ -13,3 +13,6 @@ object Profile
 
 @Serializable
 object Premiere
+
+@Serializable
+object Detail

@@ -1,6 +1,6 @@
 package mendoza.ruiz.myapplicationmovies.network
 
-import mendoza.ruiz.myapplicationmovies.Model.Pelicula
+import mendoza.ruiz.myapplicationmovies.model.Pelicula
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

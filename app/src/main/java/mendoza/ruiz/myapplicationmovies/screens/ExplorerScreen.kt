@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -28,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 
 // ── Colors
 private val Background    = Color(0xFF0D0D12)
@@ -41,23 +41,35 @@ private val SearchBg      = Color(0xFF1A1A26)
 private val StarYellow    = Color(0xFFFFC107)
 
 // ── Modelos de datos
-data class Pelicula(
-    val id: Int,
+data class Movie(
     val title: String,
-    val overview: String,
-    val year: Int,
-    val rating: Double,
-    val category: String
+    val genre: String,
+    val duration: String,
+    val rating: Float,
+    val cardColors: List<Color>,
+    val ratingColor: Color = AccentCyan
 )
 
-class ExploreViewModel : ViewModel(){
-    var peliculas by mutableStateOf<List<Pelicula>>(emptyList())
-        private set
-
-    fun cargarPelicula(lista: List<Pelicula>){
-        peliculas = lista
-    }
-}
+private val allMovies = listOf(
+    Movie("The Last Echo",      "THRILLER",  "2H 15M", 8.9f, listOf(Color(0xFF0A0A1A), Color(0xFF1A0A2E))),
+    Movie("Cinema Paradiso",    "DRAMA",     "1H 45M", 8.2f, listOf(Color(0xFF1A0F00), Color(0xFF2E1A00))),
+    Movie("Vector Prime",       "SCI-FI",    "2H 40M", 9.1f, listOf(Color(0xFF001A1A), Color(0xFF002E2E))),
+    Movie("Shadow Waltz",       "MYSTERY",   "2H 10M", 7.8f, listOf(Color(0xFF0F0F0F), Color(0xFF1A1A1A))),
+    Movie("Bloom Realm",        "ANIMATION", "1H 35M", 8.5f, listOf(Color(0xFF0A1A00), Color(0xFF142E00))),
+    Movie("Iron Cathedral",     "ACTION",    "2H 05M", 7.4f, listOf(Color(0xFF1A0A00), Color(0xFF0F0800))),
+    Movie("Ember Protocol",     "ACTION",    "1H 55M", 8.7f, listOf(Color(0xFF1A0800), Color(0xFF2E1000))),
+    Movie("Space Sarlmink",     "SCI-FI",    "2H 20M", 9.3f, listOf(Color(0xFF000A1A), Color(0xFF00102E))),
+    Movie("Hollow Signal",      "THRILLER",  "1H 50M", 8.1f, listOf(Color(0xFF0A000A), Color(0xFF1A001A))),
+    Movie("Golden Hour",        "DRAMA",     "1H 30M", 7.2f, listOf(Color(0xFF1A1200), Color(0xFF2E1E00))),
+    Movie("Neon Requiem",       "NOIR",      "2H 00M", 8.8f, listOf(Color(0xFF00001A), Color(0xFF00002E))),
+    Movie("Phantom Archive",    "MYSTERY",   "2H 30M", 8.4f, listOf(Color(0xFF0A0A0A), Color(0xFF141414))),
+    Movie("Crystal Drift",      "SCI-FI",    "1H 45M", 7.9f, listOf(Color(0xFF001A0A), Color(0xFF002E14))),
+    Movie("Crimson Veil",       "HORROR",    "1H 40M", 8.3f, listOf(Color(0xFF1A0000), Color(0xFF2E0000))),
+    Movie("The Classic",        "CLASSIC",   "2H 10M", 9.0f, listOf(Color(0xFF12100A), Color(0xFF1E1A0A))),
+    Movie("Deep Current",       "DRAMA",     "1H 55M", 7.6f, listOf(Color(0xFF001018), Color(0xFF001A28))),
+    Movie("Midnight Frequency", "NOIR",      "2H 15M", 8.6f, listOf(Color(0xFF080818), Color(0xFF10102A))),
+    Movie("Surge Protocol",     "ACTION",    "1H 50M", 7.8f, listOf(Color(0xFF180800), Color(0xFF281200))),
+)
 
 private val genres = listOf("ALL", "ACTION", "DRAMA", "SCI-FI", "HORROR", "MYSTERY", "CLASSIC", "NOIR")
 private const val PAGE_SIZE = 10
@@ -66,22 +78,23 @@ private const val PAGE_SIZE = 10
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ExplorerScreen(peliculas: List<Pelicula> = emptyList()) {
-    var searchQuery by remember {mutableStateOf("")}
-    var selectedGenre by remember {mutableStateOf("ALL")}
-    var visibleCount by remember {mutableIntStateOf(PAGE_SIZE)}
+fun ExplorerScreen(
+    onPeliculaClick: (PeliculaDetalle) -> Unit = {}
+) {
+    var searchQuery    by remember { mutableStateOf("") }
+    var selectedGenre  by remember { mutableStateOf("ALL") }
+    var visibleCount   by remember { mutableIntStateOf(PAGE_SIZE) }
 
-    //Generos dinamicos desde la api
-    val genres = listOf("ALL") + peliculas.map { it.category }.distinct()
-    val filtered = remember(searchQuery, selectedGenre, peliculas){
-        peliculas.filter { pelicula ->
-            val matchesGenre = selectedGenre == "ALL" || pelicula.category == selectedGenre
+    val filtered = remember(searchQuery, selectedGenre) {
+        allMovies.filter { movie ->
+            val matchesGenre  = selectedGenre == "ALL" || movie.genre == selectedGenre
             val matchesSearch = searchQuery.isBlank() ||
-                    pelicula.title.contains(searchQuery, ignoreCase = true) ||
-                    pelicula.category.contains(searchQuery, ignoreCase = true)
+                    movie.title.contains(searchQuery, ignoreCase = true) ||
+                    movie.genre.contains(searchQuery, ignoreCase = true)
             matchesGenre && matchesSearch
-        }.also{visibleCount = PAGE_SIZE}
+        }.also { visibleCount = PAGE_SIZE }   // reset paginación al filtrar
     }
+
     val visibleMovies = filtered.take(visibleCount)
     val hasMore       = visibleCount < filtered.size
 
@@ -115,14 +128,15 @@ fun ExplorerScreen(peliculas: List<Pelicula> = emptyList()) {
         }
 
         // ── Grid de películas
-        itemsIndexed(visibleMovies) { index, pelicula ->
+        itemsIndexed(visibleMovies) { index, movie ->
             val isFirstInRow = index % 2 == 0
             AnimatedVisibility(
                 visible = true,
                 enter = fadeIn() + slideInVertically(initialOffsetY = { it / 3 })
             ) {
                 MovieExploreCard(
-                    pelicula = pelicula,
+                    movie = movie,
+                    onPeliculaClick = onPeliculaClick,
                     modifier = Modifier.padding(
                         start = if (isFirstInRow) 16.dp else 0.dp,
                         end   = if (!isFirstInRow) 16.dp else 0.dp
@@ -130,7 +144,8 @@ fun ExplorerScreen(peliculas: List<Pelicula> = emptyList()) {
                 )
             }
         }
-        // ── Botón Reveal More
+
+        // ── Bottom Reveal More
         if (hasMore) {
             item(span = { GridItemSpan(2) }) {
                 RevealMoreButton(
@@ -142,6 +157,7 @@ fun ExplorerScreen(peliculas: List<Pelicula> = emptyList()) {
         }
     }
 }
+
 // ── Search Bar
 @Composable
 fun SearchBar(
@@ -192,6 +208,7 @@ fun SearchBar(
         }
     }
 }
+
 // ── Genre Filter Row
 @Composable
 fun GenreFilterRow(
@@ -238,30 +255,48 @@ fun GenreFilterRow(
 
 // ── Movie Explore Card
 @Composable
-fun MovieExploreCard(pelicula: Pelicula, modifier: Modifier = Modifier) {
-
-    // Color del card basado en el id (reemplaza cardColors de la lista hardcodeada)
-    val cardColors = remember(pelicula.id) {
-        val palette = listOf(
-            listOf(Color(0xFF0A0A1A), Color(0xFF1A0A2E)),
-            listOf(Color(0xFF1A0F00), Color(0xFF2E1A00)),
-            listOf(Color(0xFF001A1A), Color(0xFF002E2E)),
-            listOf(Color(0xFF0F0F0F), Color(0xFF1A1A1A)),
-            listOf(Color(0xFF0A1A00), Color(0xFF142E00)),
-        )
-        palette[pelicula.id % palette.size]
-    }
-
+fun MovieExploreCard(
+    movie: Movie,
+    onPeliculaClick: (PeliculaDetalle) -> Unit = {},
+    @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
+) {
     Column(modifier = modifier) {
+        // Cuadro de imagen
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(0.72f)
                 .clip(RoundedCornerShape(12.dp))
-                .background(Brush.verticalGradient(cardColors))
+                .background(Brush.verticalGradient(movie.cardColors))
                 .border(1.dp, Color(0xFF252535), RoundedCornerShape(12.dp))
+                .clickable {
+                    onPeliculaClick(
+                        PeliculaDetalle(
+                            id          = movie.title.hashCode(),
+                            title       = movie.title,
+                            overview    = "Una historia imperdible llena de acción y suspenso.",
+                            rating      = movie.rating.toDouble(),
+                            category    = movie.genre,
+                            duration    = parseDuration(movie.duration),
+                            year        = 2024,
+                            cardColors  = movie.cardColors
+                        )
+                    )
+                }
         ) {
-            // Badge rating
+            // Degradado sutil en la esquina superior derecha
+            Box(
+                modifier = Modifier
+                    .size(90.dp)
+                    .align(Alignment.TopEnd)
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(Color(0x18FFFFFF), Color.Transparent)
+                        )
+                    )
+            )
+
+            // Badge de rating (esquina superior derecha)
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -279,7 +314,7 @@ fun MovieExploreCard(pelicula: Pelicula, modifier: Modifier = Modifier) {
                     )
                     Spacer(modifier = Modifier.width(3.dp))
                     Text(
-                        text = String.format("%.1f", pelicula.rating),
+                        text = movie.rating.toString(),
                         color = TextPrimary,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
@@ -288,9 +323,10 @@ fun MovieExploreCard(pelicula: Pelicula, modifier: Modifier = Modifier) {
             }
         }
 
+        // Info debajo del card
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = pelicula.title,
+            text = movie.title,
             color = TextPrimary,
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
@@ -299,9 +335,18 @@ fun MovieExploreCard(pelicula: Pelicula, modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(3.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = pelicula.category, color = TextSecondary, fontSize = 11.sp)
+            Text(
+                text = movie.genre,
+                color = TextSecondary,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Medium
+            )
             Text(text = " · ", color = TextSecondary, fontSize = 11.sp)
-            Text(text = "${pelicula.year}", color = TextSecondary, fontSize = 11.sp)
+            Text(
+                text = movie.duration,
+                color = TextSecondary,
+                fontSize = 11.sp
+            )
         }
     }
 }
@@ -355,4 +400,11 @@ fun RevealMoreButton(
             }
         }
     }
+}
+
+// ── Helper: convierte "2H 15M" a minutos
+fun parseDuration(duration: String): Int {
+    val horas    = Regex("""(\d+)H""").find(duration)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+    val minutos  = Regex("""(\d+)M""").find(duration)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+    return horas * 60 + minutos
 }

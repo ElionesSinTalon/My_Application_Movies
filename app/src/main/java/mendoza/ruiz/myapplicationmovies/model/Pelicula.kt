@@ -1,4 +1,4 @@
-package mendoza.ruiz.myapplicationmovies.Model
+package mendoza.ruiz.myapplicationmovies.model
 
 data class Pelicula(
     val id: Int,

@@ -1,6 +1,6 @@
 package mendoza.ruiz.myapplicationmovies.repository
 
-import mendoza.ruiz.myapplicationmovies.Model.Pelicula
+import mendoza.ruiz.myapplicationmovies.model.Pelicula
 import mendoza.ruiz.myapplicationmovies.network.PeliculaApiService
 
 class PeliculaRepository(

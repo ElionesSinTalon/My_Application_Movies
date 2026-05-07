@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import mendoza.ruiz.myapplicationmovies.Model.Pelicula
+import mendoza.ruiz.myapplicationmovies.model.Pelicula
 import mendoza.ruiz.myapplicationmovies.repository.PeliculaRepository
 
 data class PremiereUiState(
