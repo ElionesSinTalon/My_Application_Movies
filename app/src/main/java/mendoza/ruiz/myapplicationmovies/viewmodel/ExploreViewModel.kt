@@ -1,33 +1,43 @@
 package mendoza.ruiz.myapplicationmovies.viewmodel
 
-
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import mendoza.ruiz.myapplicationmovies.network.PeliculaResponse
+import mendoza.ruiz.myapplicationmovies.repository.PeliculaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import mendoza.ruiz.myapplicationmovies.model.Pelicula
-import mendoza.ruiz.myapplicationmovies.repository.PeliculaRepository
-import kotlin.collections.map
+import mendoza.ruiz.myapplicationmovies.screens.PeliculaDetalle
 
 data class ExploreUiState(
-    val peliculas: List<Pelicula>         = emptyList(),
-    val filteredPeliculas: List<Pelicula> = emptyList(),
-    val categorias: List<String>          = listOf("ALL"),
-    val selectedCategoria: String         = "ALL",
-    val searchQuery: String               = "",
-    val currentPage: Int                  = 1,
-    val hasMore: Boolean                  = true,
-    val isLoading: Boolean                = false,
-    val errorMessage: String?             = null
+    val peliculas: List<PeliculaDetalle>         = emptyList(),
+    val filteredPeliculas: List<PeliculaDetalle> = emptyList(),
+    val categorias: List<String>                 = listOf("ALL"),
+    val selectedCategoria: String                = "ALL",
+    val searchQuery: String                      = "",
+    val isLoading: Boolean                       = false,
+    val errorMessage: String?                    = null
 )
-
+//val detalle = lista.toDetalleList()
 class ExploreViewModel(
-    private val repository: PeliculaRepository
+    private val repository: PeliculaRepository = PeliculaRepository(
+        api = TODO()
+    )
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ExploreUiState())
     val uiState: StateFlow<ExploreUiState> = _uiState
+
+    // Paleta de colors para los cards
+    private val cardPalette = listOf(
+        listOf(Color(0xFF0A0A1A), Color(0xFF1A0A2E)),
+        listOf(Color(0xFF1A0F00), Color(0xFF2E1A00)),
+        listOf(Color(0xFF001A1A), Color(0xFF002E2E)),
+        listOf(Color(0xFF0F0F0F), Color(0xFF1A1A1A)),
+        listOf(Color(0xFF0A1A00), Color(0xFF142E00)),
+        listOf(Color(0xFF1A0000), Color(0xFF2E0000)),
+    )
 
     init {
         cargarPeliculas()
@@ -37,16 +47,13 @@ class ExploreViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
-            val result = repository.getPeliculas(page = 1)
-
-            result.onSuccess { lista ->
+            repository.getPeliculas().onSuccess { lista ->
+                val detalle    = lista.mapIndexed { i, p -> p.toDetalle(i, cardPalette) }
                 val categorias = listOf("ALL") + lista.map { it.category }.distinct()
                 _uiState.value = _uiState.value.copy(
-                    peliculas         = lista,
-                    filteredPeliculas = lista,
+                    peliculas         = detalle,
+                    filteredPeliculas = detalle,
                     categorias        = categorias,
-                    currentPage       = 1,
-                    hasMore           = lista.size >= 20,
                     isLoading         = false
                 )
             }.onFailure { error ->
@@ -58,53 +65,42 @@ class ExploreViewModel(
         }
     }
 
-    fun cargarMas() {
-        if (_uiState.value.isLoading || !_uiState.value.hasMore) return
-        viewModelScope.launch {
-            val nextPage = _uiState.value.currentPage + 1
-            _uiState.value = _uiState.value.copy(isLoading = true)
-
-            val result = repository.getPeliculas(page = nextPage)
-
-            result.onSuccess { nuevas ->
-                val todas = _uiState.value.peliculas + nuevas
-                _uiState.value = _uiState.value.copy(
-                    peliculas         = todas,
-                    filteredPeliculas = aplicarFiltros(todas),
-                    currentPage       = nextPage,
-                    hasMore           = nuevas.size >= 20,
-                    isLoading         = false
-                )
-            }.onFailure {
-                _uiState.value = _uiState.value.copy(isLoading = false)
-            }
-        }
-    }
-
     fun onSearchQueryChange(query: String) {
         _uiState.value = _uiState.value.copy(searchQuery = query)
-        aplicarYActualizar()
+        aplicarFiltros()
     }
 
     fun onCategoriaSelected(categoria: String) {
         _uiState.value = _uiState.value.copy(selectedCategoria = categoria)
-        aplicarYActualizar()
+        aplicarFiltros()
     }
 
-    private fun aplicarYActualizar() {
-        val filtered = aplicarFiltros(_uiState.value.peliculas)
-        _uiState.value = _uiState.value.copy(filteredPeliculas = filtered)
-    }
-
-    private fun aplicarFiltros(lista: List<Pelicula>): List<Pelicula> {
+    private fun aplicarFiltros() {
         val query     = _uiState.value.searchQuery
         val categoria = _uiState.value.selectedCategoria
-        return lista.filter { pelicula ->
-            val matchesCategoria = categoria == "ALL" || pelicula.category == categoria
+        val filtered  = _uiState.value.peliculas.filter { p ->
+            val matchesCategoria = categoria == "ALL" || p.category == categoria
             val matchesSearch    = query.isBlank() ||
-                    pelicula.title.contains(query, ignoreCase = true) ||
-                    pelicula.category.contains(query, ignoreCase = true)
+                    p.title.contains(query, ignoreCase = true) ||
+                    p.category.contains(query, ignoreCase = true)
             matchesCategoria && matchesSearch
         }
+        _uiState.value = _uiState.value.copy(filteredPeliculas = filtered)
     }
 }
+
+// ── Extensión: PeliculaResponse → PeliculaDetalle
+fun PeliculaResponse.toDetalle(
+    index: Int,
+    palette: List<List<Color>>
+): PeliculaDetalle = PeliculaDetalle(
+    id         = id,
+    title      = title,
+    overview   = overview,
+    rating     = rating,
+    category   = category,
+    duration   = duration,
+    year       = year,
+    director   = director,
+    cardColors = palette[index % palette.size]
+)

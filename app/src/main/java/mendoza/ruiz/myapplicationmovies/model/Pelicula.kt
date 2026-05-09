@@ -1,5 +1,7 @@
 package mendoza.ruiz.myapplicationmovies.model
 
+import java.util.Date
+
 data class Pelicula(
     val id: Int,
     val title: String,
@@ -10,6 +12,6 @@ data class Pelicula(
     val director: String,
     val duration: Int, //en minutos
     val format: String, //Imax, 4DX, Dolby, etc
-    val isPremiereM: Boolean,//true = proximo estreno
-    val releaseDate: String //12 oct, 25 nov, etc
+    val isPremiere: Boolean,//true = proximo estreno
+    val releaseDate: Date //12 oct, 25 nov, etc
 )

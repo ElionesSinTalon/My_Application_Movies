@@ -1,41 +1,39 @@
 package mendoza.ruiz.myapplicationmovies.repository
 
-import mendoza.ruiz.myapplicationmovies.model.Pelicula
 import mendoza.ruiz.myapplicationmovies.network.PeliculaApiService
+import mendoza.ruiz.myapplicationmovies.network.PeliculaRequest
+import mendoza.ruiz.myapplicationmovies.network.PeliculaResponse
+import mendoza.ruiz.myapplicationmovies.network.RetrofitInstance
 
 class PeliculaRepository(
-    private val api: PeliculaApiService
+    private val api: PeliculaApiService = RetrofitInstance.api
 ) {
 
-    // ── Home
-    suspend fun getFeaturedPeliculas(): Result<List<Pelicula>> = runCatching {
-        api.getFeaturedPeliculas()
+    // ── GET / peliculas - Todas las peliculas
+    suspend fun getPeliculas(): Result<List<PeliculaResponse>> = runCatching {
+        api.getPeliculas()
     }
 
-    suspend fun getNowPlaying(): Result<List<Pelicula>> = runCatching {
-        api.getNowPlaying()
-    }
-
-    suspend fun getTrending(): Result<List<Pelicula>> = runCatching {
-        api.getTrending()
-    }
-
-    // ── Explore
-    suspend fun getPeliculas(page: Int = 1, limit: Int = 20): Result<List<Pelicula>> = runCatching {
-        api.getPeliculas(page, limit)
-    }
-
-    suspend fun getPeliculasByCategoria(category: String): Result<List<Pelicula>> = runCatching {
-        api.getPeliculasByCategoria(category)
-    }
-
-    // ── Premiere
-    suspend fun getUpcoming(): Result<List<Pelicula>> = runCatching {
-        api.getUpcoming()
-    }
-
-    // ── Detalle
-    suspend fun getPeliculaById(id: Int): Result<Pelicula> = runCatching {
+    // GET - /Peliculas por id
+    suspend fun getPeliculaById(id: Int): Result<PeliculaResponse> = runCatching {
         api.getPeliculaById(id)
     }
+
+    //POST - Crear peliculas
+    suspend fun createPelicula(pelicula: PeliculaRequest): Result<PeliculaResponse> = runCatching {
+        api.createPelicula(pelicula)
+    }
+
+
+    //PUT - Actulizar
+    suspend fun updatePelicula(id: Int, pelicula: PeliculaRequest): Result<PeliculaResponse> = runCatching {
+        api.updatePelicula(id, pelicula)
+    }
+
+    //DELETE
+    suspend fun deletePelicula(id: Int): Result<Unit> = runCatching {
+        api.deletePelicula(id)
+    }
+
+
 }

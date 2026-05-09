@@ -1,43 +1,65 @@
 package mendoza.ruiz.myapplicationmovies.network
 
-import mendoza.ruiz.myapplicationmovies.model.Pelicula
+import com.google.gson.annotations.SerializedName
+import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
-import retrofit2.http.Query
 
+// Modelo de respuesta - Connection with Api
+data class PeliculaResponse(
+    @SerializedName("id") val id: Int,
+    @SerializedName("title") val title: String,
+    @SerializedName("overview") val overview: String,
+    @SerializedName("year") val year: Int,
+    @SerializedName("rating") val rating: Double,
+    @SerializedName("category") val category: String,
+    @SerializedName("director") val director: String,
+    @SerializedName("duration") val duration: Int,
+    @SerializedName("format") val format: String,
+    @SerializedName("isPremiere") val isPremiere: Boolean,
+    @SerializedName("releaseDate") val releaseDate: String
+)
+
+// Modelo para crear / actualizar
+data class PeliculaRequest(
+    @SerializedName("id") val id: Int,
+    @SerializedName("title") val title: String,
+    @SerializedName("overview") val overview: String,
+    @SerializedName("year") val year: Int,
+    @SerializedName("rating") val rating: Double,
+    @SerializedName("category") val category: String,
+    @SerializedName("director") val director: String,
+    @SerializedName("duration") val duration: Int,
+    @SerializedName("format") val format: String,
+    @SerializedName("isPremiere") val isPremiere: Boolean,
+    @SerializedName("releaseDate") val releaseDate: String
+)
+// EndPoints
 interface PeliculaApiService {
-
     @GET("peliculas")
-    suspend fun getPeliculas(
-        @Query("page") page: Int = 1,
-        @Query("limit") limit: Int = 20
-    ): List<Pelicula>
+    suspend fun getPeliculas(): List<PeliculaResponse>
 
-    // Películas por categoría
-    @GET("peliculas")
-    suspend fun getPeliculasByCategoria(
-        @Query("category") category: String
-    ): List<Pelicula>
-
-    // Películas destacadas para el hero
-    @GET("peliculas/featured")
-    suspend fun getFeaturedPeliculas(): List<Pelicula>
-
-    // Películas en cartelera (Now Playing)
-    @GET("peliculas/now-playing")
-    suspend fun getNowPlaying(): List<Pelicula>
-
-    // Próximos estrenos
-    @GET("peliculas/upcoming")
-    suspend fun getUpcoming(): List<Pelicula>
-
-    // Tendencias
-    @GET("peliculas/trending")
-    suspend fun getTrending(): List<Pelicula>
-
-    // Detalle de una película
-    @GET("peliculas/{id}")
+    @GET("peliculas/{pelicula_id}")
     suspend fun getPeliculaById(
-        @Path("id") id: Int
-    ): Pelicula
+        @Path("pelicula_id") peliculaId: Int
+    ): PeliculaResponse
+
+    @POST("peliculas")
+    suspend fun createPelicula(
+        @Body pelicula: PeliculaRequest
+    ): PeliculaResponse
+
+    @PUT("peliculas/{pelicula_id}")
+    suspend fun updatePelicula(
+        @Path("pelicula_id") peliculaId: Int,
+        @Body pelicula: PeliculaRequest
+    ): PeliculaResponse
+
+    @DELETE("peliculas/{pelicula_id}")
+    suspend fun deletePelicula(
+        @Path("pelicula_id") peliculaId: Int
+    )
 }
