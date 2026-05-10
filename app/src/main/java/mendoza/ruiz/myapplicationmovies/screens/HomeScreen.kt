@@ -1,9 +1,9 @@
 package mendoza.ruiz.myapplicationmovies.screens
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -28,25 +29,25 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import mendoza.ruiz.myapplicationmovies.model.PeliculaDetalle
+import mendoza.ruiz.myapplicationmovies.viewmodel.HomeViewModel
 
 // ── Paleta de colors
 private val Background    = Color(0xFF0D0D12)
@@ -57,61 +58,72 @@ private val TextSecondary = Color(0xFFB0B0C0)
 private val StarYellow    = Color(0xFFFFC107)
 private val PremiereTag   = Color(0xFFE040FB)
 
-// ── HomeScreen
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    onPeliculaClick: (PeliculaDetalle) -> Unit = {}   // 👈 agregado
+    viewModel: HomeViewModel = viewModel(),
+    onPeliculaClick: (PeliculaDetalle) -> Unit = {}
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-            .verticalScroll(rememberScrollState())
-    ) {
-        HeroSection()
-        Spacer(modifier = Modifier.height(24.dp))
-        NowPlayingSection(onPeliculaClick = onPeliculaClick)   // 👈 propagado
-        Spacer(modifier = Modifier.height(32.dp))
-        PopularGenresSection()
-        Spacer(modifier = Modifier.height(32.dp))
-        TrendingNowSection()
-        Spacer(modifier = Modifier.height(32.dp))
-        ContinueWatchingSection()
-        Spacer(modifier = Modifier.height(40.dp))
+    val uiState by viewModel.uiState.collectAsState()
+
+    Box(modifier = modifier.fillMaxSize().background(Background)) {
+        if (uiState.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = AccentCyan)
+        } else if (uiState.errorMessage != null) {
+            Text(
+                text = uiState.errorMessage ?: "Error desconocido",
+                color = Color.Red,
+                modifier = Modifier.align(Alignment.Center).padding(20.dp)
+            )
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // Hero Section con la primera de featured o una por defecto
+                val featured = uiState.featuredPeliculas.firstOrNull()
+                HeroSection(pelicula = featured, onPeliculaClick = onPeliculaClick)
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                NowPlayingSection(
+                    peliculas = uiState.nowPlaying,
+                    onPeliculaClick = onPeliculaClick
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+                PopularGenresSection()
+
+                Spacer(modifier = Modifier.height(32.dp))
+                TrendingNowSection(peliculas = uiState.trending)
+
+                Spacer(modifier = Modifier.height(32.dp))
+                ContinueWatchingSection()
+
+                Spacer(modifier = Modifier.height(40.dp))
+            }
+        }
     }
 }
 
-// ── Hero Section
 @Composable
-fun HeroSection(modifier: Modifier = Modifier) {
+fun HeroSection(
+    pelicula: PeliculaDetalle?,
+    onPeliculaClick: (PeliculaDetalle) -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(360.dp)
     ) {
+        // Fondo con colores de la película o gradiente por defecto
+        val bgColors = pelicula?.cardColors ?: listOf(Color(0xFF1C0A0A), Color(0xFF0D0D12))
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(Color(0xFF1C0A0A), Color(0xFF0D0D12))
-                    )
-                )
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.6f)
-                    .background(
-                        Brush.radialGradient(
-                            colors = listOf(Color(0x553D0000), Color(0x00000000))
-                        )
-                    )
-            )
-        }
+                .background(Brush.verticalGradient(colors = bgColors))
+        )
 
         Box(
             modifier = Modifier
@@ -128,130 +140,107 @@ fun HeroSection(modifier: Modifier = Modifier) {
                 .align(Alignment.BottomStart)
                 .padding(start = 20.dp, end = 20.dp, bottom = 24.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .background(PremiereTag, RoundedCornerShape(4.dp))
-                        .padding(horizontal = 8.dp, vertical = 3.dp)
-                ) {
+            pelicula?.let { p ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .background(PremiereTag, RoundedCornerShape(4.dp))
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    ) {
+                        Text(
+                            text = "PREMIERE",
+                            color = TextPrimary,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        tint = StarYellow,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "PREMIERE",
-                        color = TextPrimary,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp
+                        text = "${p.rating} RATING",
+                        color = StarYellow,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
-                Spacer(modifier = Modifier.width(10.dp))
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = null,
-                    tint = StarYellow,
-                    modifier = Modifier.size(14.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
+
+                Spacer(modifier = Modifier.height(10.dp))
+
                 Text(
-                    text = "9.2 RATING",
-                    color = StarYellow,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold
+                    text = p.title,
+                    color = TextPrimary,
+                    fontSize = 34.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    lineHeight = 38.sp
                 )
-            }
 
-            Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(SpanStyle(color = TextPrimary, fontWeight = FontWeight.ExtraBold)) {
-                        append("Shadows of ")
+                Text(
+                    text = p.overview,
+                    color = TextSecondary,
+                    fontSize = 13.sp,
+                    lineHeight = 19.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth(0.85f)
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(
+                        onClick = { onPeliculaClick(p) },
+                        colors = ButtonDefaults.buttonColors(containerColor = AccentCyan),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 10.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = null,
+                            tint = Background,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(text = "Ver ahora", color = Background, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     }
-                    withStyle(SpanStyle(color = AccentCyan, fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold)) {
-                        append("Aeon")
+
+                    OutlinedButton(
+                        onClick = {},
+                        border = androidx.compose.foundation.BorderStroke(1.5.dp, TextSecondary),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 10.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null,
+                            tint = TextPrimary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(text = "Mi Lista", color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                     }
-                },
-                fontSize = 34.sp,
-                lineHeight = 38.sp
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = "Content Description",
-                color = TextSecondary,
-                fontSize = 13.sp,
-                lineHeight = 19.sp,
-                modifier = Modifier.fillMaxWidth(0.85f)
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(
-                    onClick = {},
-                    colors = ButtonDefaults.buttonColors(containerColor = AccentCyan),
-                    shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(horizontal = 18.dp, vertical = 10.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = null,
-                        tint = Background,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "Ver ahora", color = Background, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                }
-
-                OutlinedButton(
-                    onClick = {},
-                    border = androidx.compose.foundation.BorderStroke(1.5.dp, TextSecondary),
-                    shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(horizontal = 18.dp, vertical = 10.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.Transparent)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null,
-                        tint = TextPrimary,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "Mi Lista", color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                 }
             }
         }
     }
 }
 
-// ── Now Playing Section ────────────────────────────────────────────────────────
 @Composable
 fun NowPlayingSection(
-    modifier: Modifier = Modifier,
-    onPeliculaClick: (PeliculaDetalle) -> Unit = {}   // 👈 agregado
+    peliculas: List<PeliculaDetalle>,
+    onPeliculaClick: (PeliculaDetalle) -> Unit
 ) {
     Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(text = "Now Playing", color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(4.dp))
-                Box(
-                    modifier = Modifier
-                        .width(48.dp)
-                        .height(2.dp)
-                        .background(
-                            Brush.horizontalGradient(colors = listOf(AccentCyan, AccentPink)),
-                            RoundedCornerShape(1.dp)
-                        )
-                )
-            }
-            Text(text = "VIEW ALL", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
-        }
+        SectionHeader(title = "Now Playing")
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -259,63 +248,61 @@ fun NowPlayingSection(
             contentPadding = PaddingValues(horizontal = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(6) { index ->
+            itemsIndexed(peliculas) { index, pelicula ->
                 MovieCard(
                     index = index,
-                    onPeliculaClick = onPeliculaClick   // 👈 propagado
+                    pelicula = pelicula,
+                    onPeliculaClick = onPeliculaClick
                 )
             }
         }
     }
 }
 
-// ── Movie Card ─────────────────────────────────────────────────────────────────
+@Composable
+fun SectionHeader(title: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column {
+            Text(text = title, color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Box(
+                modifier = Modifier
+                    .width(48.dp)
+                    .height(2.dp)
+                    .background(
+                        Brush.horizontalGradient(colors = listOf(AccentCyan, AccentPink)),
+                        RoundedCornerShape(1.dp)
+                    )
+            )
+        }
+        Text(text = "VIEW ALL", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
+    }
+}
+
 @Composable
 fun MovieCard(
     index: Int,
-    onPeliculaClick: (PeliculaDetalle) -> Unit = {}   // 👈 agregado
+    pelicula: PeliculaDetalle,
+    onPeliculaClick: (PeliculaDetalle) -> Unit
 ) {
-    val cardColorsList = listOf(
-        listOf(Color(0xFF0A1A1A), Color(0xFF003333)),
-        listOf(Color(0xFF1A0000), Color(0xFF330000)),
-        listOf(Color(0xFF000D1A), Color(0xFF001A33)),
-        listOf(Color(0xFF1A1000), Color(0xFF332000)),
-        listOf(Color(0xFF0D001A), Color(0xFF1A0033)),
-        listOf(Color(0xFF001A0A), Color(0xFF00331A)),
-    )
-    val titlesList = listOf(
-        "Shadows of Aeon", "Neon Requiem", "Deep Signal",
-        "Amber Protocol", "Void Drift", "Emerald Code"
-    )
-    val colors = cardColorsList[index % cardColorsList.size]
-    val title  = titlesList[index % titlesList.size]
-
     Box(
         modifier = Modifier
             .width(150.dp)
             .height(200.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(Brush.verticalGradient(colors = colors))
+            .background(Brush.verticalGradient(colors = pelicula.cardColors))
             .border(
                 width = 1.dp,
                 brush = Brush.verticalGradient(colors = listOf(Color(0x33FFFFFF), Color(0x00FFFFFF))),
                 shape = RoundedCornerShape(12.dp)
             )
-            // 👈 clickable que construye PeliculaDetalle y navega al detalle
-            .clickable {
-                onPeliculaClick(
-                    PeliculaDetalle(
-                        id         = index,
-                        title      = title,
-                        overview   = "Una película imperdible llena de acción y misterio.",
-                        rating     = 8.0 - (index * 0.1),
-                        category   = "THRILLER",
-                        duration   = 120 + (index * 5),
-                        year       = 2024,
-                        cardColors = colors
-                    )
-                )
-            }
+            .clickable { onPeliculaClick(pelicula) }
     ) {
         Box(
             modifier = Modifier
@@ -326,24 +313,31 @@ fun MovieCard(
                 )
         )
         Text(
-            text = "${index + 1}",
+            text = pelicula.title.take(1),
             color = Color(0x44FFFFFF),
             fontSize = 48.sp,
             fontWeight = FontWeight.ExtraBold,
             modifier = Modifier.align(Alignment.Center)
         )
+        Text(
+            text = pelicula.title,
+            color = TextPrimary,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp)
+        )
     }
 }
 
-// ── Popular Genres Section ─────────────────────────────────────────────────────
-private val genres = listOf(
-    Triple("NOIR",     listOf(Color(0xFF12121E), Color(0xFF1E1E32)), AccentCyan),
-    Triple("SCI-FI",   listOf(Color(0xFF1A0D2E), Color(0xFF2D1060)), AccentPink),
-    Triple("PRESTIGE", listOf(Color(0xFF2A0A0A), Color(0xFF1A0000)), Color(0xFFFF5252)),
-)
-
 @Composable
-fun PopularGenresSection(modifier: Modifier = Modifier) {
+fun PopularGenresSection() {
+    val genres = listOf(
+        Triple("NOIR",     listOf(Color(0xFF12121E), Color(0xFF1E1E32)), AccentCyan),
+        Triple("SCI-FI",   listOf(Color(0xFF1A0D2E), Color(0xFF2D1060)), AccentPink),
+        Triple("PRESTIGE", listOf(Color(0xFF2A0A0A), Color(0xFF1A0000)), Color(0xFFFF5252)),
+    )
     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
         Text(text = "Géneros populares", color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(14.dp))
@@ -361,10 +355,6 @@ fun PopularGenresSection(modifier: Modifier = Modifier) {
                         .border(width = 1.dp, color = accent.copy(alpha = 0.25f), shape = RoundedCornerShape(10.dp)),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (label == "SCI-FI") {
-                        Box(modifier = Modifier.align(Alignment.CenterStart).padding(start = 10.dp).size(4.dp).background(accent.copy(alpha = 0.6f), RoundedCornerShape(2.dp)))
-                        Box(modifier = Modifier.align(Alignment.CenterEnd).padding(end = 10.dp).size(4.dp).background(accent.copy(alpha = 0.6f), RoundedCornerShape(2.dp)))
-                    }
                     Text(text = label, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.5.sp)
                 }
             }
@@ -372,15 +362,8 @@ fun PopularGenresSection(modifier: Modifier = Modifier) {
     }
 }
 
-// ── Trending Now Section ───────────────────────────────────────────────────────
-private val trendingItems = listOf(
-    Pair("#01", "CYBERPUNK 2077"),
-    Pair("#02", "MIDNIGHT LIBRARY"),
-    Pair("#03", "QUANTUM STATE"),
-)
-
 @Composable
-fun TrendingNowSection(modifier: Modifier = Modifier) {
+fun TrendingNowSection(peliculas: List<PeliculaDetalle>) {
     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = "Trending Now", color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
@@ -388,8 +371,11 @@ fun TrendingNowSection(modifier: Modifier = Modifier) {
             Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = null, tint = AccentCyan, modifier = Modifier.size(20.dp))
         }
         Spacer(modifier = Modifier.height(14.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            trendingItems.forEach { (number, title) ->
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            peliculas.forEachIndexed { index, pelicula ->
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
@@ -398,9 +384,9 @@ fun TrendingNowSection(modifier: Modifier = Modifier) {
                         .padding(horizontal = 14.dp, vertical = 8.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = number, color = AccentCyan, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Text(text = "#${String.format("%02d", index + 1)}", color = AccentCyan, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = title, color = TextPrimary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                        Text(text = pelicula.title.uppercase(), color = TextPrimary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -408,23 +394,12 @@ fun TrendingNowSection(modifier: Modifier = Modifier) {
     }
 }
 
-// ── Continue Watching Section ──────────────────────────────────────────────────
-data class ContinueItem(
-    val title: String,
-    val genre: String,
-    val subtitle: String,
-    val subtitleAccent: Boolean,
-    val progress: Float,
-    val cardColors: List<Color>
-)
-
-private val continueItems = listOf(
-    ContinueItem("Crossing the Divide", "DOCUMENTARY", "45 mins left", false, 0.35f, listOf(Color(0xFF1A1200), Color(0xFF2A1E00))),
-    ContinueItem("Static Frequencies",  "THRILLER",    "NEW EPISODE",  true,  -1f,   listOf(Color(0xFF0D1A0D), Color(0xFF1A2A00))),
-)
-
 @Composable
-fun ContinueWatchingSection(modifier: Modifier = Modifier) {
+fun ContinueWatchingSection() {
+    val continueItems = listOf(
+        ContinueItem("Crossing the Divide", "DOCUMENTARY", "45 mins left", false, 0.35f, listOf(Color(0xFF1A1200), Color(0xFF2A1E00))),
+        ContinueItem("Static Frequencies",  "THRILLER",    "NEW EPISODE",  true,  -1f,   listOf(Color(0xFF0D1A0D), Color(0xFF1A2A00))),
+    )
     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
         Text(text = "Continuar viendo", color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(14.dp))
@@ -449,48 +424,25 @@ fun ContinueCard(item: ContinueItem, modifier: Modifier = Modifier) {
                 .clip(RoundedCornerShape(10.dp))
                 .background(Brush.verticalGradient(item.cardColors))
                 .border(width = 1.dp, color = Color(0xFF333344), shape = RoundedCornerShape(10.dp))
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .align(Alignment.BottomCenter)
-                    .background(Brush.verticalGradient(listOf(Color.Transparent, Color(0xAA000000))))
-            )
-        }
-
+        )
         if (item.progress >= 0f) {
             Spacer(modifier = Modifier.height(6.dp))
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(3.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(Color(0xFF333344))
+                modifier = Modifier.fillMaxWidth().height(3.dp).background(Color(0xFF333344), RoundedCornerShape(2.dp))
             ) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth(item.progress)
-                        .fillMaxHeight()
+                    modifier = Modifier.fillMaxWidth(item.progress).fillMaxHeight()
                         .background(Brush.horizontalGradient(listOf(AccentCyan, AccentPink)), RoundedCornerShape(2.dp))
                 )
             }
-        } else {
-            Spacer(modifier = Modifier.height(9.dp))
         }
-
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = item.title, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Spacer(modifier = Modifier.height(4.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = item.genre, color = TextSecondary, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+            Text(text = item.genre, color = TextSecondary, fontSize = 11.sp)
             Text(text = " · ", color = TextSecondary, fontSize = 11.sp)
-            Text(
-                text = item.subtitle,
-                color = if (item.subtitleAccent) AccentCyan else TextSecondary,
-                fontSize = 11.sp,
-                fontWeight = if (item.subtitleAccent) FontWeight.Bold else FontWeight.Normal
-            )
+            Text(text = item.subtitle, color = if (item.subtitleAccent) AccentCyan else TextSecondary, fontSize = 11.sp)
         }
     }
 }
+data class ContinueItem(val title: String, val genre: String, val subtitle: String, val subtitleAccent: Boolean, val progress: Float, val cardColors: List<Color>)

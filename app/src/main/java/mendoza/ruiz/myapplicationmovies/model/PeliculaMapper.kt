@@ -2,7 +2,6 @@ package mendoza.ruiz.myapplicationmovies.model
 
 import androidx.compose.ui.graphics.Color
 import mendoza.ruiz.myapplicationmovies.network.PeliculaResponse
-import mendoza.ruiz.myapplicationmovies.screens.PeliculaDetalle
 
 // ── Paleta de colors
 val defaultCardPalette = listOf(
@@ -18,8 +17,9 @@ val defaultCardPalette = listOf(
     listOf(Color(0xFF1A0030), Color(0xFF0A0018)),
 )
 
-// ── Extensión principal
-// PeliculaResponse (API) → PeliculaDetalle (UI)
+
+ // Maps PeliculaResponse (API) to PeliculaDetalle (UI)
+
 fun PeliculaResponse.toDetalle(
     index: Int = 0,
     palette: List<List<Color>> = defaultCardPalette
@@ -35,8 +35,9 @@ fun PeliculaResponse.toDetalle(
     cardColors = palette[index % palette.size]
 )
 
-// ── Extensión para listas
-// Convierte una lista entera de PeliculaResponse → List<PeliculaDetalle>
+
+// Converts a list of PeliculaResponse to a list of PeliculaDetalle
+
 fun List<PeliculaResponse>.toDetalleList(
     palette: List<List<Color>> = defaultCardPalette
 ): List<PeliculaDetalle> = mapIndexed { index, pelicula ->

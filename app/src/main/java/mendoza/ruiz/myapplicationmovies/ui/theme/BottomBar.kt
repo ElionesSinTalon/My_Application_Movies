@@ -1,7 +1,5 @@
 package mendoza.ruiz.myapplicationmovies.ui.theme
 
-//import androidx.compose.material.icons.filled.LibraryBooks
-//import androidx.compose.material.icons.filled.Movie
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -41,8 +39,6 @@ import androidx.compose.ui.unit.sp
 private val NavBackground = Color(0xFF12121C)
 private val NavBorder     = Color(0xFF2A2A3A)
 private val AccentCyan    = Color(0xFF00E5FF)
-//private val AccentPink    = Color(0xFFE040FB)
-//private val TextActive    = Color(0xFFFFFFFF)
 private val TextInactive  = Color(0xFF6B6B80)
 
 // ── Modelo de ítem

@@ -60,7 +60,7 @@ private val TextPrimary   = Color(0xFFFFFFFF)
 private val TextSecondary = Color(0xFFB0B0C0)
 private val DividerColor  = Color(0xFF2A2A3A)
 
-// ── Pantalla de perfil
+// ── ProfileScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable

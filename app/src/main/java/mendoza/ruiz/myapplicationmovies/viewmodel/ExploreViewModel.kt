@@ -1,14 +1,14 @@
 package mendoza.ruiz.myapplicationmovies.viewmodel
 
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import mendoza.ruiz.myapplicationmovies.network.PeliculaResponse
 import mendoza.ruiz.myapplicationmovies.repository.PeliculaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import mendoza.ruiz.myapplicationmovies.screens.PeliculaDetalle
+import mendoza.ruiz.myapplicationmovies.model.PeliculaDetalle
+import mendoza.ruiz.myapplicationmovies.model.toDetalleList
+
 
 data class ExploreUiState(
     val peliculas: List<PeliculaDetalle>         = emptyList(),
@@ -19,25 +19,13 @@ data class ExploreUiState(
     val isLoading: Boolean                       = false,
     val errorMessage: String?                    = null
 )
-//val detalle = lista.toDetalleList()
+
 class ExploreViewModel(
-    private val repository: PeliculaRepository = PeliculaRepository(
-        api = TODO()
-    )
+    private val repository: PeliculaRepository = PeliculaRepository()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ExploreUiState())
     val uiState: StateFlow<ExploreUiState> = _uiState
-
-    // Paleta de colors para los cards
-    private val cardPalette = listOf(
-        listOf(Color(0xFF0A0A1A), Color(0xFF1A0A2E)),
-        listOf(Color(0xFF1A0F00), Color(0xFF2E1A00)),
-        listOf(Color(0xFF001A1A), Color(0xFF002E2E)),
-        listOf(Color(0xFF0F0F0F), Color(0xFF1A1A1A)),
-        listOf(Color(0xFF0A1A00), Color(0xFF142E00)),
-        listOf(Color(0xFF1A0000), Color(0xFF2E0000)),
-    )
 
     init {
         cargarPeliculas()
@@ -48,7 +36,7 @@ class ExploreViewModel(
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
             repository.getPeliculas().onSuccess { lista ->
-                val detalle    = lista.mapIndexed { i, p -> p.toDetalle(i, cardPalette) }
+                val detalle    = lista.toDetalleList()
                 val categorias = listOf("ALL") + lista.map { it.category }.distinct()
                 _uiState.value = _uiState.value.copy(
                     peliculas         = detalle,
@@ -88,19 +76,3 @@ class ExploreViewModel(
         _uiState.value = _uiState.value.copy(filteredPeliculas = filtered)
     }
 }
-
-// ── Extensión: PeliculaResponse → PeliculaDetalle
-fun PeliculaResponse.toDetalle(
-    index: Int,
-    palette: List<List<Color>>
-): PeliculaDetalle = PeliculaDetalle(
-    id         = id,
-    title      = title,
-    overview   = overview,
-    rating     = rating,
-    category   = category,
-    duration   = duration,
-    year       = year,
-    director   = director,
-    cardColors = palette[index % palette.size]
-)

@@ -13,18 +13,27 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import mendoza.ruiz.myapplicationmovies.model.PeliculaDetalle
+import mendoza.ruiz.myapplicationmovies.repository.PeliculaRepository
 import mendoza.ruiz.myapplicationmovies.screens.DetailScreen
 import mendoza.ruiz.myapplicationmovies.screens.ExplorerScreen
 import mendoza.ruiz.myapplicationmovies.screens.HomeScreen
-import mendoza.ruiz.myapplicationmovies.screens.PeliculaDetalle
 import mendoza.ruiz.myapplicationmovies.screens.PremiereScreen
 import mendoza.ruiz.myapplicationmovies.screens.ProfileScreen
 import mendoza.ruiz.myapplicationmovies.ui.theme.BottomBar
+import mendoza.ruiz.myapplicationmovies.viewmodel.ExploreViewModel
+import mendoza.ruiz.myapplicationmovies.viewmodel.HomeViewModel
+import mendoza.ruiz.myapplicationmovies.viewmodel.PremiereViewModel
+import mendoza.ruiz.myapplicationmovies.viewmodel.ViewModelFactory
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     var peliculaSeleccionada by remember { mutableStateOf<PeliculaDetalle?>(null) }
+
+    val repository = remember { PeliculaRepository() }
+    val factory = remember { ViewModelFactory(repository) }
 
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStack?.destination?.route
@@ -77,9 +86,11 @@ fun AppNavigation() {
             navController = navController,
             startDestination = "home",
             modifier = Modifier.padding(innerPadding)
-        ){
+        ) {
             composable("home") {
+                val viewModel: HomeViewModel = viewModel(factory = factory)
                 HomeScreen(
+                    viewModel = viewModel,
                     onPeliculaClick = { pelicula ->
                         peliculaSeleccionada = pelicula
                         navController.navigate("detail")
@@ -87,7 +98,9 @@ fun AppNavigation() {
                 )
             }
             composable("explorer") {
+                val viewModel: ExploreViewModel = viewModel(factory = factory)
                 ExplorerScreen(
+                    viewModel = viewModel,
                     onPeliculaClick = { pelicula ->
                         peliculaSeleccionada = pelicula
                         navController.navigate("detail")
@@ -95,7 +108,9 @@ fun AppNavigation() {
                 )
             }
             composable("premiere") {
+                val viewModel: PremiereViewModel = viewModel(factory = factory)
                 PremiereScreen(
+                    viewModel = viewModel,
                     onPeliculaClick = { pelicula ->
                         peliculaSeleccionada = pelicula
                         navController.navigate("detail")

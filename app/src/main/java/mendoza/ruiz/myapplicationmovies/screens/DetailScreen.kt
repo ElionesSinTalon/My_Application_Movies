@@ -4,17 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mendoza.ruiz.myapplicationmovies.model.PeliculaDetalle
 import java.util.Locale
 
 // ── Colors
@@ -47,22 +38,6 @@ private val TextPrimary   = Color(0xFFFFFFFF)
 private val TextSecondary = Color(0xFFB0B0C0)
 private val DividerColor  = Color(0xFF2A2A3A)
 private val StarYellow    = Color(0xFFFFC107)
-
-// ── Modelo simplificado para navegación
-// Pasa el id de la película y carga el detalle desde el ViewModel
-// Si aún no tienes ViewModel conectado, puedes pasar los datos directamente
-
-data class PeliculaDetalle(
-    val id: Int,
-    val title: String,
-    val overview: String,
-    val rating: Double,
-    val category: String,
-    val duration: Int,         // minutos
-    val year: Int,
-    val director: String = "",
-    val cardColors: List<Color> = listOf(Color(0xFF0A0A1A), Color(0xFF1A1A2E))
-)
 
 // ── Detail Screen
 @OptIn(ExperimentalMaterial3Api::class)
@@ -134,6 +109,16 @@ fun DetailScreen(
 
             // Chips de info adicional
             InfoChipsRow(pelicula = pelicula)
+
+            if (pelicula.director.isNotBlank()) {
+                Spacer(modifier = Modifier.height(20.dp))
+                Text(
+                    text = "Director: ${pelicula.director}",
+                    color = TextSecondary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -295,7 +280,7 @@ fun InfoChipsRow(pelicula: PeliculaDetalle) {
         Pair("GÉNERO",    pelicula.category),
         Pair("DURACIÓN",  "${pelicula.duration} min"),
         Pair("AÑO",       "${pelicula.year}"),
-        Pair("RATING",    "${pelicula.rating}/10"),
+        Pair("RATING",    String.format(Locale.US, "%.1f/10", pelicula.rating)),
     )
 
     Row(
