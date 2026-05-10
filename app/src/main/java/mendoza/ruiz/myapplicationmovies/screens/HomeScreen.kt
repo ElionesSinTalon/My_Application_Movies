@@ -41,11 +41,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import mendoza.ruiz.myapplicationmovies.model.PeliculaDetalle
 import mendoza.ruiz.myapplicationmovies.screens.components.ErrorStateView
 import mendoza.ruiz.myapplicationmovies.viewmodel.HomeViewModel
@@ -124,6 +126,18 @@ fun HeroSection(
                 .fillMaxSize()
                 .background(Brush.verticalGradient(colors = bgColors))
         )
+
+        // Poster real con AsyncImage
+        pelicula?.let { p ->
+            if (p.posterUrl.isNotBlank()) {
+                AsyncImage(
+                    model = p.posterUrl,
+                    contentDescription = p.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
 
         Box(
             modifier = Modifier
@@ -304,6 +318,15 @@ fun MovieCard(
             )
             .clickable { onPeliculaClick(pelicula) }
     ) {
+        if (pelicula.posterUrl.isNotBlank()) {
+            AsyncImage(
+                model = pelicula.posterUrl,
+                contentDescription = pelicula.title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
         Box(
             modifier = Modifier
                 .size(80.dp)

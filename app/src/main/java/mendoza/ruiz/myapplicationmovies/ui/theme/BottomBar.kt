@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,8 +50,8 @@ data class NavItem(
 
 private val navItems = listOf(
     NavItem("HOME",    Icons.Default.Home),
-    NavItem("MOVIES",  Icons.Default.PlayArrow),
-    NavItem("PREMIERE", Icons.Default.Search),
+    NavItem("MOVIES",  Icons.Default.Search),
+    NavItem("PREMIERE", Icons.Default.PlayArrow),
     NavItem("PROFILE", Icons.Default.AccountCircle),
 )
 
@@ -96,15 +97,15 @@ fun BottomBar(
                 modifier = Modifier.weight(1f)
             )
 
-            // Últimos 2 ítems (LIBRARY, PROFILE)
+            // Últimos 2 ítems (PREMIERE, PROFILE)
             navItems.takeLast(2).forEachIndexed { index, item ->
                 val realIndex = index + 2
                 NavBarItem(
                     item = item,
                     isSelected = selectedIndex == realIndex,
                     onClick = { onItemSelected(realIndex) },
-                    modifier = Modifier.weight(1f),
-                    )
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }
@@ -187,8 +188,8 @@ fun CenterButton(
                 .clickable(onClick = onClick)
         ) {
             Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add",
+                imageVector = Icons.Default.Star,
+                contentDescription = "Star",
                 tint = Color.White,
                 modifier = Modifier.size(26.dp)
             )

@@ -20,7 +20,8 @@ data class PeliculaResponse(
     @SerializedName("duration") val duration: Int = 0,
     @SerializedName("format") val format: String = "",
     @SerializedName("isPremiere") val isPremiere: Boolean = false,
-    @SerializedName("releaseDate") val releaseDate: String = ""
+    @SerializedName("releaseDate") val releaseDate: String = "",
+    @SerializedName("posterUrl") val posterUrl: String = ""
 )
 
 // Modelo para crear / actualizar

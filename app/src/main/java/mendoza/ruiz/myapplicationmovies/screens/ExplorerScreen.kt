@@ -38,10 +38,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import mendoza.ruiz.myapplicationmovies.model.PeliculaDetalle
 import mendoza.ruiz.myapplicationmovies.screens.components.ErrorStateView
 import mendoza.ruiz.myapplicationmovies.viewmodel.ExploreViewModel
@@ -223,6 +225,14 @@ fun MovieExploreCard(
                 .border(1.dp, Color(0xFF252535), RoundedCornerShape(12.dp))
                 .clickable { onPeliculaClick(movie) }
         ) {
+            if (movie.posterUrl.isNotBlank()) {
+                AsyncImage(
+                    model = movie.posterUrl,
+                    contentDescription = movie.title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
             Box(
                 modifier = Modifier
                     .size(90.dp)

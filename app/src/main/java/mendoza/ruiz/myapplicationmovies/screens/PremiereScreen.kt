@@ -41,10 +41,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import kotlinx.coroutines.delay
 import mendoza.ruiz.myapplicationmovies.model.PeliculaDetalle
 import mendoza.ruiz.myapplicationmovies.screens.components.ErrorStateView
@@ -146,6 +148,14 @@ fun FeaturedMovieSlide(
     onPeliculaClick: (PeliculaDetalle) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(movie.cardColors))) {
+        if (movie.posterUrl.isNotBlank()) {
+            AsyncImage(
+                model = movie.posterUrl,
+                contentDescription = movie.title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
         Box(modifier = Modifier.fillMaxWidth().height(200.dp).align(Alignment.BottomCenter).background(Brush.verticalGradient(listOf(Color.Transparent, Background))))
         Column(modifier = Modifier.align(Alignment.BottomStart).padding(start = 20.dp, end = 20.dp, bottom = 36.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -227,6 +237,14 @@ fun ProximaMovieCard(
             .border(1.dp, DividerColor, RoundedCornerShape(14.dp))
             .clickable { onPeliculaClick(movie) }
     ) {
+        if (movie.posterUrl.isNotBlank()) {
+            AsyncImage(
+                model = movie.posterUrl,
+                contentDescription = movie.title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
         Box(
             modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter)
                 .background(Brush.verticalGradient(listOf(Color.Transparent, Color(0xEE0D0D12))))

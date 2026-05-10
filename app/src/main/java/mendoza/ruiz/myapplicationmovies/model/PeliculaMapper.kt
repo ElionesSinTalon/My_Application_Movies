@@ -32,12 +32,11 @@ fun PeliculaResponse.toDetalle(
     duration   = duration,
     year       = year,
     director   = director,
+    posterUrl  = posterUrl,
     cardColors = palette[index % palette.size]
 )
 
-
 // Converts a list of PeliculaResponse to a list of PeliculaDetalle
-
 fun List<PeliculaResponse>.toDetalleList(
     palette: List<List<Color>> = defaultCardPalette
 ): List<PeliculaDetalle> = mapIndexed { index, pelicula ->
