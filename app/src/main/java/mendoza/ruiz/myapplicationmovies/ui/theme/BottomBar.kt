@@ -64,7 +64,7 @@ fun BottomBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(180.dp)
+            .height(80.dp)
             .background(NavBackground)
             .border(
                 width = 2.dp,

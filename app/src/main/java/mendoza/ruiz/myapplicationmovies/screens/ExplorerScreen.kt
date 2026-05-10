@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mendoza.ruiz.myapplicationmovies.model.PeliculaDetalle
+import mendoza.ruiz.myapplicationmovies.screens.components.ErrorStateView
 import mendoza.ruiz.myapplicationmovies.viewmodel.ExploreViewModel
 
 // ── Colors
@@ -64,6 +65,11 @@ fun ExplorerScreen(
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
         if (uiState.isLoading && uiState.peliculas.isEmpty()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = AccentCyan)
+        } else if (uiState.errorMessage != null && uiState.peliculas.isEmpty()) {
+            ErrorStateView(
+                message = uiState.errorMessage ?: "Error desconocido",
+                onRetry = { viewModel.cargarPeliculas() }
+            )
         } else {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
@@ -102,16 +108,6 @@ fun ExplorerScreen(
                             end   = if (!isFirstInRow) 16.dp else 0.dp
                         )
                     )
-                }
-
-                if (uiState.errorMessage != null && uiState.peliculas.isEmpty()) {
-                    item(span = { GridItemSpan(2) }) {
-                        Text(
-                            text = uiState.errorMessage ?: "Error",
-                            color = Color.Red,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
                 }
             }
         }

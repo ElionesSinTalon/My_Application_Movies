@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mendoza.ruiz.myapplicationmovies.model.PeliculaDetalle
+import mendoza.ruiz.myapplicationmovies.screens.components.ErrorStateView
 import mendoza.ruiz.myapplicationmovies.viewmodel.HomeViewModel
 
 // ── Paleta de colors
@@ -67,13 +68,12 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     Box(modifier = modifier.fillMaxSize().background(Background)) {
-        if (uiState.isLoading) {
+        if (uiState.isLoading && uiState.featuredPeliculas.isEmpty()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = AccentCyan)
-        } else if (uiState.errorMessage != null) {
-            Text(
-                text = uiState.errorMessage ?: "Error desconocido",
-                color = Color.Red,
-                modifier = Modifier.align(Alignment.Center).padding(20.dp)
+        } else if (uiState.errorMessage != null && uiState.featuredPeliculas.isEmpty()) {
+            ErrorStateView(
+                message = uiState.errorMessage ?: "Error desconocido",
+                onRetry = { viewModel.cargarHome() }
             )
         } else {
             Column(

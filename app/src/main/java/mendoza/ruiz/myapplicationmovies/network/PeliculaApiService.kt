@@ -10,17 +10,17 @@ import retrofit2.http.Path
 
 // Modelo de respuesta - Connection with Api
 data class PeliculaResponse(
-    @SerializedName("id") val id: Int,
-    @SerializedName("title") val title: String,
-    @SerializedName("overview") val overview: String,
-    @SerializedName("year") val year: Int,
-    @SerializedName("rating") val rating: Double,
-    @SerializedName("category") val category: String,
-    @SerializedName("director") val director: String,
-    @SerializedName("duration") val duration: Int,
-    @SerializedName("format") val format: String,
-    @SerializedName("isPremiere") val isPremiere: Boolean,
-    @SerializedName("releaseDate") val releaseDate: String
+    @SerializedName("id") val id: Int = 0,
+    @SerializedName("title") val title: String = "",
+    @SerializedName("overview") val overview: String = "",
+    @SerializedName("year") val year: Int = 0,
+    @SerializedName("rating") val rating: Double = 0.0,
+    @SerializedName("category") val category: String = "",
+    @SerializedName("director") val director: String = "",
+    @SerializedName("duration") val duration: Int = 0,
+    @SerializedName("format") val format: String = "",
+    @SerializedName("isPremiere") val isPremiere: Boolean = false,
+    @SerializedName("releaseDate") val releaseDate: String = ""
 )
 
 // Modelo para crear / actualizar

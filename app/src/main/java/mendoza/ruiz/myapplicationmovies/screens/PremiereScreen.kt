@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import mendoza.ruiz.myapplicationmovies.model.PeliculaDetalle
+import mendoza.ruiz.myapplicationmovies.screens.components.ErrorStateView
 import mendoza.ruiz.myapplicationmovies.viewmodel.PremiereViewModel
 
 // ── Colors
@@ -68,6 +69,11 @@ fun PremiereScreen(
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
         if (uiState.isLoading && uiState.featured.isEmpty()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = AccentCyan)
+        } else if (uiState.errorMessage != null && uiState.featured.isEmpty()) {
+            ErrorStateView(
+                message = uiState.errorMessage ?: "Error desconocido",
+                onRetry = { viewModel.cargarPremiere() }
+            )
         } else {
             Column(
                 modifier = Modifier
@@ -86,14 +92,6 @@ fun PremiereScreen(
                 
                 Spacer(modifier = Modifier.height(40.dp))
             }
-        }
-        
-        if (uiState.errorMessage != null && uiState.featured.isEmpty()) {
-            Text(
-                text = uiState.errorMessage ?: "Error",
-                color = Color.Red,
-                modifier = Modifier.align(Alignment.Center).padding(20.dp)
-            )
         }
     }
 }
