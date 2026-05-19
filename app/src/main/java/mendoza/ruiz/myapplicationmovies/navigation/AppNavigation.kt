@@ -2,38 +2,42 @@ package mendoza.ruiz.myapplicationmovies.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import mendoza.ruiz.myapplicationmovies.model.PeliculaDetalle
+import mendoza.ruiz.myapplicationmovies.model.toDetalle
 import mendoza.ruiz.myapplicationmovies.repository.PeliculaRepository
 import mendoza.ruiz.myapplicationmovies.screens.DetailScreen
 import mendoza.ruiz.myapplicationmovies.screens.ExplorerScreen
 import mendoza.ruiz.myapplicationmovies.screens.HomeScreen
 import mendoza.ruiz.myapplicationmovies.screens.PremiereScreen
 import mendoza.ruiz.myapplicationmovies.screens.ProfileScreen
+import mendoza.ruiz.myapplicationmovies.screens.components.QuickActionsBottomSheet
 import mendoza.ruiz.myapplicationmovies.ui.theme.BottomBar
 import mendoza.ruiz.myapplicationmovies.viewmodel.ExploreViewModel
 import mendoza.ruiz.myapplicationmovies.viewmodel.HomeViewModel
 import mendoza.ruiz.myapplicationmovies.viewmodel.PremiereViewModel
 import mendoza.ruiz.myapplicationmovies.viewmodel.ViewModelFactory
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     var peliculaSeleccionada by remember { mutableStateOf<PeliculaDetalle?>(null) }
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val repository = remember { PeliculaRepository() }
     val factory = remember { ViewModelFactory(repository) }
+
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStack?.destination?.route
@@ -51,6 +55,7 @@ fun AppNavigation() {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             if (showBottomBar) {
                 BottomBar(
@@ -71,17 +76,47 @@ fun AppNavigation() {
                         }
                     },
                     onCenterClick = {
-                        navController.navigate("premiere"){
-                            popUpTo("home") { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
-
-                        }
+                        showBottomSheet = true
                     }
                 )
             }
         }
     ){ innerPadding ->
+        if (showBottomSheet) {
+            QuickActionsBottomSheet(
+                onDismissRequest = { showBottomSheet = false },
+                onAddToList = {
+                    showBottomSheet = false
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Added to My List")
+                    }
+                },
+                onRandomMovie = {
+                    showBottomSheet = false
+                    scope.launch {
+                        repository.getPeliculas().onSuccess { lista ->
+                            if (lista.isNotEmpty()) {
+                                val randomMovie = lista.random().toDetalle()
+                                peliculaSeleccionada = randomMovie
+                                navController.navigate("detail")
+                            }
+                        }.onFailure {
+                            snackbarHostState.showSnackbar("Error fetching movies")
+                        }
+                    }
+                },
+                onCreateCollection = {
+                    showBottomSheet = false
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Collection created successfully")
+                    }
+                },
+                onTopRated = {
+                    showBottomSheet = false
+                    navController.navigate("explorer")
+                }
+            )
+        }
         NavHost(
             navController = navController,
             startDestination = "home",

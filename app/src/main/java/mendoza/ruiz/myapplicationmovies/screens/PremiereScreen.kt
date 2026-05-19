@@ -49,13 +49,14 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import kotlinx.coroutines.delay
 import mendoza.ruiz.myapplicationmovies.model.PeliculaDetalle
+import mendoza.ruiz.myapplicationmovies.screens.components.BannerCarousel
 import mendoza.ruiz.myapplicationmovies.screens.components.ErrorStateView
 import mendoza.ruiz.myapplicationmovies.viewmodel.PremiereViewModel
 
 // ── Colors
 private val Background    = Color(0xFF0D0D12)
 private val SurfaceCard   = Color(0xFF16161F)
-private val AccentCyan    = Color(0xFF00E5FF)
+private val AccentCyan    = Color(0xFF00E5FF) 
 private val AccentPink    = Color(0xFFE040FB)
 private val TextPrimary   = Color(0xFFFFFFFF)
 private val TextSecondary = Color(0xFFB0B0C0)
@@ -82,6 +83,12 @@ fun PremiereScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
+                // Top Banner Carousel con estrenos
+                BannerCarousel(
+                    movies = uiState.premierePosters,
+                    onPeliculaClick = onPeliculaClick
+                )
+
                 if (uiState.featured.isNotEmpty()) {
                     FeaturedMoviePager(movies = uiState.featured, onPeliculaClick = onPeliculaClick)
                 }

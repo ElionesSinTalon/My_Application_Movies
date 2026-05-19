@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import mendoza.ruiz.myapplicationmovies.model.PeliculaDetalle
+import mendoza.ruiz.myapplicationmovies.screens.components.BannerCarousel
 import mendoza.ruiz.myapplicationmovies.screens.components.ErrorStateView
 import mendoza.ruiz.myapplicationmovies.viewmodel.HomeViewModel
 
@@ -83,6 +84,12 @@ fun HomeScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
+                // Top Banner Carousel con posters aleatorios
+                BannerCarousel(
+                    movies = uiState.randomPosters,
+                    onPeliculaClick = onPeliculaClick
+                )
+
                 // Hero Section con la primera de featured o una por defecto
                 val featured = uiState.featuredPeliculas.firstOrNull()
                 HeroSection(pelicula = featured, onPeliculaClick = onPeliculaClick)
@@ -357,9 +364,9 @@ fun MovieCard(
 @Composable
 fun PopularGenresSection() {
     val genres = listOf(
-        Triple("NOIR",     listOf(Color(0xFF12121E), Color(0xFF1E1E32)), AccentCyan),
-        Triple("SCI-FI",   listOf(Color(0xFF1A0D2E), Color(0xFF2D1060)), AccentPink),
-        Triple("PRESTIGE", listOf(Color(0xFF2A0A0A), Color(0xFF1A0000)), Color(0xFFFF5252)),
+        Triple("ACCION/AVENTURA",     listOf(Color(0xFF12121E), Color(0xFF1E1E32)), AccentCyan),
+        Triple("CIENCIA FICCION/AVENTURA",   listOf(Color(0xFF1A0D2E), Color(0xFF2D1060)), AccentPink),
+        Triple("ANIMACION", listOf(Color(0xFF2A0A0A), Color(0xFF1A0000)), Color(0xFFFF5252)),
     )
     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
         Text(text = "Géneros populares", color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)

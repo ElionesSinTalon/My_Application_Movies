@@ -12,6 +12,7 @@ import mendoza.ruiz.myapplicationmovies.model.toDetalleList
 data class PremiereUiState(
     val featured: List<PeliculaDetalle>  = emptyList(),  // isPremiere = true
     val upcoming: List<PeliculaDetalle>  = emptyList(),  // isPremiere = true, ordenadas por fecha
+    val premierePosters: List<PeliculaDetalle> = emptyList(), // posters de estrenos
     val isLoading: Boolean               = false,
     val errorMessage: String?            = null
 )
@@ -44,9 +45,15 @@ class PremiereViewModel(
                     .sortedBy { it.releaseDate }
                     .toDetalleList()
 
+                // premierePosters → solo isPremiere = true
+                val premieres = lista
+                    .filter { it.isPremiere }
+                    .toDetalleList()
+
                 _uiState.value = _uiState.value.copy(
                     featured     = featured,
                     upcoming     = upcoming,
+                    premierePosters = premieres,
                     isLoading    = false,
                     errorMessage = null
                 )

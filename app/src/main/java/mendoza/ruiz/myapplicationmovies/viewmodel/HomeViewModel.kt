@@ -13,6 +13,7 @@ data class HomeUiState(
     val featuredPeliculas: List<PeliculaDetalle> = emptyList(), // isPremiere = true
     val nowPlaying: List<PeliculaDetalle>         = emptyList(), // primeras 6
     val trending: List<PeliculaDetalle>           = emptyList(), // top por rating
+    val randomPosters: List<PeliculaDetalle>      = emptyList(), // posters aleatorios
     val isLoading: Boolean                        = false,
     val errorMessage: String?                     = null
 )
@@ -50,10 +51,17 @@ class HomeViewModel(
                     .take(3)
                     .toDetalleList()
 
+                // randomPosters → 10 películas aleatorias
+                val random = lista
+                    .shuffled()
+                    .take(10)
+                    .toDetalleList()
+
                 _uiState.value = _uiState.value.copy(
                     featuredPeliculas = featured,
                     nowPlaying        = nowPlaying,
                     trending          = trending,
+                    randomPosters     = random,
                     isLoading         = false,
                     errorMessage      = null
                 )
