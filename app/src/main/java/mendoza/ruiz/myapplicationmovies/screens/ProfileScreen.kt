@@ -82,7 +82,7 @@ fun ProfileScreen() {
 
         // Nombre
         Text(
-            text = "Pedro Rafael",
+            text = "xXTilinInsanoXx",
             color = TextPrimary,
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold
@@ -333,7 +333,7 @@ private val miListaItems = listOf(
         listOf(Color(0xFF0A0A10), Color(0xFF141420))),
 )
 
-private val listaTabs = listOf("All", "Movies", "Series", "Recent")
+private val listaTabs = listOf("All", "Movies", "Recent")
 
 // ── Mi Lista Section ───────────────────────────────────────────────────────────
 @Composable
@@ -348,7 +348,7 @@ fun MiListaSection() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Mi Lista",
+                text = "My List",
                 color = TextPrimary,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.ExtraBold
@@ -553,7 +553,7 @@ data class Collection(
 
 private val collections = listOf(
     Collection(
-        name = "Film Noir Essentials",
+        name = "Interestellar",
         type = "PUBLIC COLLECTION",
         count = 14,
         isPrivate = false,
@@ -720,7 +720,7 @@ fun NewCollectionButton() {
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Nueva Coleccion",
+                text = "New Collection",
                 color = TextSecondary,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,

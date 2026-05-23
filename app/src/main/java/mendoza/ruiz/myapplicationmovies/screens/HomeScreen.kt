@@ -75,7 +75,7 @@ fun HomeScreen(
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center), color = AccentCyan)
         } else if (uiState.errorMessage != null && uiState.featuredPeliculas.isEmpty()) {
             ErrorStateView(
-                message = uiState.errorMessage ?: "Error desconocido",
+                message = uiState.errorMessage ?: "Unknown Error",
                 onRetry = { viewModel.cargarHome() }
             )
         } else {
@@ -185,7 +185,7 @@ fun HeroSection(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${p.rating} RATING",
+                        text = "${p.rating} Rating",
                         color = StarYellow,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold
@@ -230,7 +230,7 @@ fun HeroSection(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = "Ver ahora", color = Background, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        Text(text = "Watch now", color = Background, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     }
 
                     OutlinedButton(
@@ -247,7 +247,7 @@ fun HeroSection(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = "Mi Lista", color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                        Text(text = "My List", color = TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                     }
                 }
             }
@@ -302,7 +302,7 @@ fun SectionHeader(title: String) {
                     )
             )
         }
-        Text(text = "VIEW ALL", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
+        Text(text = "View all", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
     }
 }
 
@@ -364,12 +364,12 @@ fun MovieCard(
 @Composable
 fun PopularGenresSection() {
     val genres = listOf(
-        Triple("ACCION/AVENTURA",     listOf(Color(0xFF12121E), Color(0xFF1E1E32)), AccentCyan),
-        Triple("CIENCIA FICCION/AVENTURA",   listOf(Color(0xFF1A0D2E), Color(0xFF2D1060)), AccentPink),
-        Triple("ANIMACION", listOf(Color(0xFF2A0A0A), Color(0xFF1A0000)), Color(0xFFFF5252)),
+        Triple("Action/Adventure",     listOf(Color(0xFF12121E), Color(0xFF1E1E32)), AccentCyan),
+        Triple("Sci-Fi/Adventure",   listOf(Color(0xFF1A0D2E), Color(0xFF2D1060)), AccentPink),
+        Triple("Animation", listOf(Color(0xFF2A0A0A), Color(0xFF1A0000)), Color(0xFFFF5252)),
     )
     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-        Text(text = "Géneros populares", color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Popular genres", color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(14.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -431,7 +431,7 @@ fun ContinueWatchingSection() {
         ContinueItem("Static Frequencies",  "THRILLER",    "NEW EPISODE",  true,  -1f,   listOf(Color(0xFF0D1A0D), Color(0xFF1A2A00))),
     )
     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-        Text(text = "Continuar viendo", color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Continue watching", color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(14.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),

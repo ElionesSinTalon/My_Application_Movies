@@ -42,7 +42,7 @@ fun BannerCarousel(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(400.dp) // Height for the banner
+            .height(600.dp) // Height for the banner
     ) {
         HorizontalPager(
             state = pagerState,
@@ -75,7 +75,7 @@ fun BannerCarousel(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp)
+                        .height(400.dp)
                         .align(Alignment.BottomCenter)
                         .background(
                             Brush.verticalGradient(
