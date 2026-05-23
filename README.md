@@ -59,4 +59,4 @@ Key Endpoints:
 - `GET /peliculas/{id}`: Get movie details.
 
 ---
-Developed by Pedro Rafael.
+Developed by Pedro Rafael, Uriel Enrique and David Fregoso.
